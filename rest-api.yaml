@@ -1,0 +1,672 @@
+openapi: 3.0.3
+info:
+  title: DocumentBase API
+  description: |-
+    Die DocumentBase API ist die Grundlage der Webapp _DocumentBase_ und deckt die funktionalen Anforderungen ab.
+  license:
+    name: GNU General Public License v3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+  version: 1.0.0
+servers:
+  - url: n/a
+tags:
+  - name: documents
+  - name: user
+  - name: category
+  - name: tags
+paths:
+  /documents:
+    post:
+      tags:
+        - documents
+      summary: Neues Dokument hinzufügen
+      operationId: addDocument
+      requestBody:
+        description: Ein Dokument erstellen
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDocument'
+        required: true
+      responses:
+        '200':
+          description: OK - gibt die ID des erstellten Dokuments zurück.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 123
+        '409':
+          description: Benutzer existiert bereits
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    get:
+      tags:
+        - documents
+      summary: Dokumente anhand von Queryparametern abfragen
+      operationId: searchDocuments
+      parameters:
+        - name: text
+          in: query
+          required: false
+          description: Suche in name, description und fileName
+          schema:
+            type: string
+            example: Rechnung Mustermann
+        - name: categoryId
+          in: query
+          required: false
+          description: Filtere Dokumente durch Kategorie
+          schema:
+            type: integer
+            example: 123
+        - name: tagIds
+          in: query
+          required: false
+          description: Filtere Dokumente durch Tags
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: sensible
+          in: query
+          required: false
+          description: Filtere geschützte Dokumente
+          schema:
+            type: boolean
+          allowEmptyValue: true
+        - name: limit
+          in: query
+          required: false
+          description: Begrenze die Anzahl der Dokumente
+          schema:
+            type: integer
+            example: 50
+      responses:
+        '200':
+          description: OK - gibt ein Array aller passenden Dokumente zurück
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+        '400':
+          description: Bad Request
+  /documents/upload/{documentId}:
+    post:
+      tags:
+        - documents
+      summary: Datei zu Dokument hinzufügen
+      operationId: addDocumentFile
+      parameters:
+        - name: documentId
+          in: path
+          description: ID of the matching document
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Geschütztes Dokument - Benutzer ist nicht Ersteller
+        '409':
+          description: Datei zu Dokument existiert bereits
+        '422':
+          description: Unprocessable Entity
+    put:
+      tags:
+        - documents
+      summary: Datei zu Dokument aktualisieren.
+      operationId: updateDocumentFile
+      parameters:
+        - name: documentId
+          in: path
+          description: Die ID des Dokuments
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Datei aktualisieren
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: Datei aktualisiert
+        '400':
+          description: Invalid ID supplied
+        '403':
+          description: Geschütztes Dokument - Benutzer ist nicht Ersteller
+        '404':
+          description: Dokument mit dieser ID existiert nicht
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+  /documents/{documentId}:
+    put:
+      tags:
+        - documents
+      summary: Dokument aktualisieren.
+      operationId: updateDocument
+      parameters:
+        - name: documentId
+          in: path
+          description: Die ID des Dokuments
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Aktualisieren eines existierenden Dokuments
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDocument'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 123
+        '400':
+          description: Invalid ID supplied
+        '403':
+          description: Geschütztes Dokument - Benutzer ist nicht Ersteller
+        '404':
+          description: Dokument mit dieser ID existiert nicht
+        '405':
+          description: Invalid input gives a detailed error message.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Document name exists already.
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    get:
+      tags:
+        - documents
+      summary: Dokument anhand der ID abfragen
+      operationId: getDocument
+      parameters:
+        - name: documentId
+          in: path
+          description: Die ID des Dokuments
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK - Im Falle eines geschützten Dokuments wird die fileSource obfuskiert.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Dokument mit dieser ID existiert nicht
+    delete:
+      tags:
+        - documents
+      summary: Dokument löschen
+      operationId: deleteDocument
+      parameters:
+        - name: documentId
+          in: path
+          description: Die ID des Dokuments
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+        '403':
+          description: Geschütztes Dokument - Benutzer ist nicht Ersteller
+        '404':
+          description: Ein Dokument mit dieser ID existiert nicht
+  /user:
+    post:
+      tags:
+        - user
+      summary: Neuen Benutzer hinzufügen
+      operationId: addUser
+      requestBody:
+        description: Erstellen eines neuen Benutzers
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: Benutzer angelegt - generierte ID als Rückgabewert
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 123
+                
+        '409':
+          description: Benutzer existiert bereits
+  /user/{userId}:
+    get:
+      tags:
+        - user
+      summary: Benutzer abfragen
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/UserResponse'
+        '404':
+          description: Benutzer nicht gefunden
+    put:
+      tags:
+        - user
+      summary: Benutzerdaten aktualisieren
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      requestBody:
+        description: Neue Benutzerdaten
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Benutzer aktualisiert
+        '403':
+          description: Falscher Benutzer angemeldet
+        '404':
+          description: Benutzer nicht gefunden
+    delete:
+      tags:
+        - user
+      summary: Benutzer löschen
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: Benutzer gelöscht
+        '403':
+          description: Falscher Benutzer angemeldet
+        '404':
+          description: Benutzer nicht gefunden
+  /user/newPassword:
+    get:
+      tags:
+        - user
+      summary: Passwort vergessen
+      parameters:
+        - name: user
+          in: query
+          schema:
+            type: string
+            example: max_mustermann
+          required: true
+      responses:
+        '200':
+          description: E-Mail wurde verschickt
+        '404':
+          description: Benutzer existiert nicht
+  /categories:
+    get:
+      tags:
+        - category
+      summary: Liefert alle Kategorien
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      tags:
+        - category
+      summary: Kategorie hinzufügen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              example: Rechnung
+      responses:
+        '200':
+          description: Kategorie hinzugefügt - ID als Rückgabewert
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 123
+        '400':
+          description: Kategorie invalide
+        '409':
+          description: Kategorie existiert bereits
+  /categories/{categoryId}:
+    get:
+      tags:
+        - category
+      summary: Kategorie nach ID
+      parameters:
+        - name: categoryId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Kategorie nicht gefunden
+    delete:
+      tags:
+        - category
+      summary: Kategorie entfernen
+      parameters:
+        - name: categoryId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Kategorie existiert nicht
+        '405':
+          description: Kategorie wird verwendet
+  /tags:
+    get:
+      tags:
+        - tags
+      summary: Liefert alle Tags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+    post:
+      tags:
+        - tags
+      summary: Tag hinzufügen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              example: krankenkasse
+      responses:
+        '200':
+          description: Tag hinzugefügt - ID als Rückgabewert
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 123
+        '400':
+          description: Tag invalide
+        '409':
+          description: Tag existiert bereits
+  /tags/{tagId}:
+    get:
+      tags:
+        - tags
+      summary: Tag nach ID
+      parameters:
+        - name: tagId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '404':
+          description: Tag nicht gefunden
+    delete:
+      tags:
+        - tags
+      summary: Tag entfernen
+      parameters:
+        - name: tagId
+          in: path
+          schema:
+            type: integer
+            example: 123
+          required: true
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Tag existiert nicht
+        '405':
+          description: Tag wird verwendet
+components:
+  schemas:
+    NewDocument:
+      required:
+        - name
+        - category
+        - fileName
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        name:
+          type: string
+          example: Rechnung März 2023
+        description:
+          type: string
+          example: Diese Beschreibung enthält einige Zusatzinformationen.
+        category:
+          $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        sensible:
+          type: boolean
+        fileName:
+          type: string
+          example: Document.pdf
+      xml:
+        name: document_post
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        name:
+          type: string
+          example: Rechnung März 2023
+        description:
+          type: string
+          example: Diese Beschreibung enthält einige Zusatzinformationen.
+        category:
+          $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        sensible:
+          type: boolean
+        fileSource:
+          type: string
+          example: link/to/Document.pdf
+        changes:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Change'
+      xml:
+        name: document_post
+    User:
+      required:
+        - username
+        - email
+        - password
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        username:
+          type: string
+          example: max_mustermann
+        email:
+          type: string
+          example: max.mustermann@email.com
+        password:
+          type: string
+          example: '12345'
+      xml:
+        name: user
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        username:
+          type: string
+          example: max_mustermann
+        email:
+          type: string
+          example: max.mustermann@email.com
+      xml:
+        name: userResponse
+    Category:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+          readOnly: true
+        name:
+          type: string
+          example: Rechnung
+      xml:
+        name: category
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+          readOnly: true
+        name:
+          type: string
+          example: krankenkasse
+      xml:
+        name: tag
+    Change:
+      type: object
+      properties:
+        action:
+          type: string
+          example: Creation
+        user:
+          $ref: '#/components/schemas/User'
+        timestamp:
+          type: string
+          format: date-time
+      xml:
+        name: change
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Pet'
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
