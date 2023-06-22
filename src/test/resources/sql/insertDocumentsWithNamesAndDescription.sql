@@ -1,0 +1,2 @@
+INSERT INTO document (name, description) VALUES ('MeineRechnung123', 'Diese Rechnung ist aus dem Jahr 2023');
+INSERT INTO document (name, description) VALUES ('MeinZeugnis123', 'Dieses Dokument ist ein Zeugnis aus der Schule');

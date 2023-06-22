@@ -2,7 +2,7 @@ package com.rovlkr.documentbase.model;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class NewDocument {
@@ -10,7 +10,7 @@ public class NewDocument {
     private String name;
     private String description;
     private Category category;
-    private List<Tag> tags;
+    private Set<Tag> tags;
     private boolean sensible;
     private String fileName;
 }

@@ -16,16 +16,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "category",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"id", "name"})
-)
+@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "name" }))
 public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
-    private long id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
+
+    public CategoryEntity(String name) {
+        this.name = name;
+    }
 }

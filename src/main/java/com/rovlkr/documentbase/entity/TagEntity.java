@@ -15,16 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "tag",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"id", "name"})
-)
+@Table(name = "tag", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "name" }))
 public class TagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
-    private long id;
+    private Long id;
 
     @Column
     private String name;
+
+    public TagEntity(String name) {
+        this.name = name;
+    }
 }

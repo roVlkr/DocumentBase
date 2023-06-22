@@ -29,7 +29,7 @@ public class DocumentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
-    private long id;
+    private Long id;
 
     @Column
     private String name;
@@ -50,7 +50,7 @@ public class DocumentEntity {
     private Set<TagEntity> tags;
 
     @Column
-    private boolean sensible;
+    private Boolean sensible;
 
     @Column(name = "file_location")
     private String fileLocation;

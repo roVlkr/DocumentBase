@@ -1,8 +1,8 @@
 package com.rovlkr.documentbase.model;
 
-import lombok.Data;
-
 import java.util.Set;
+
+import lombok.Data;
 
 @Data
 public class Document {

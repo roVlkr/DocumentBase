@@ -1,14 +1,22 @@
 version: '3.9'
 
+networks:
+  my_network:
+    driver: bridge
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - JAR_FILE=target/*.jar
     ports:
       - 8080:8080
     depends_on:
       - db
+    networks:
+      - my_network
 
   db:
     image: postgres:latest
@@ -18,3 +26,5 @@ services:
       - POSTGRES_DB=documentbase
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=dbpassword
+    networks:
+      - my_network
