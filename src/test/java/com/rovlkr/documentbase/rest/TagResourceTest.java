@@ -10,22 +10,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+import com.rovlkr.documentbase.mapping.TagMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.model.TagBuilder;
-import com.rovlkr.documentbase.model.Tag;
+import com.rovlkr.documentbase.builder.entity.TagEntityBuilder;
+import com.rovlkr.documentbase.entity.TagEntity;
 import com.rovlkr.documentbase.service.TagService;
 
 @WebMvcTest(TagResource.class)
 class TagResourceTest {
+
+    @TestConfiguration
+    static class TagResourceTestConfiguration {
+        @Bean
+        public TagMapper tagMapper() {
+            return new TagMapper();
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,21 +47,21 @@ class TagResourceTest {
     @Test
     void createTag_defaultTagName_successful() throws Exception {
         /// Arrange ///
-        String tagName = TestData.TAG_NAME_1;
-        when(tagService.createTag(tagName)).thenReturn(1L);
+        TagEntity tagEntity = TagEntityBuilder.builder().id(null).name(TestData.TAG_NAME_1).build();
+        when(tagService.createTag(tagEntity)).thenReturn(1L);
 
         /// Act + Assert ///
-        mockMvc.perform(post("/tags").content(tagName)) //
+        mockMvc.perform(post("/tags").content(tagEntity.getName())) //
                 .andExpect(status().isCreated()) //
                 .andExpect(content().string("1"));
-        verify(tagService).createTag(tagName);
+        verify(tagService).createTag(tagEntity);
     }
 
     @Test
     void getAllCategories_noArgs_successful() throws Exception {
         /// Arrange ///
-        Tag tag = TagBuilder.builder().withDefaultValues1().build();
-        when(tagService.getAllTags()).thenReturn(Set.of(tag));
+        TagEntity tagEntity = TagEntityBuilder.builder().withDefaultValues1().build();
+        when(tagService.getAllTags()).thenReturn(List.of(tagEntity));
 
         /// Act + Assert ///
         mockMvc.perform(get("/tags")) //
@@ -64,12 +75,23 @@ class TagResourceTest {
     void getTag_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        Tag tag = TagBuilder.builder().withDefaultValues1().build();
-        when(tagService.getTag(id)).thenReturn(Optional.of(tag));
+        TagEntity tagEntity = TagEntityBuilder.builder().withDefaultValues1().build();
+        when(tagService.getTag(id)).thenReturn(Optional.of(tagEntity));
 
         /// Act + Assert ///
         mockMvc.perform(get("/tags/" + id)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", equalTo(TestData.TAG_NAME_1)));
+        verify(tagService).getTag(id);
+    }
+
+    @Test
+    void getCategory_withId_notFound() throws Exception {
+        /// Arrange ///
+        final Long id = 1L;
+        when(tagService.getTag(id)).thenReturn(Optional.empty());
+
+        /// Act + Assert ///
+        mockMvc.perform(get("/tags/" + id)).andExpect(status().isNotFound());
         verify(tagService).getTag(id);
     }
 }

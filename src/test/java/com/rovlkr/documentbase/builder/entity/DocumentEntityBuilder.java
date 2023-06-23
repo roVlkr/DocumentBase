@@ -11,12 +11,12 @@ import com.rovlkr.documentbase.entity.TagEntity;
 
 public class DocumentEntityBuilder {
 
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private CategoryEntity category;
     private List<TagEntity> tags;
-    private boolean sensible;
+    private Boolean sensible;
     private String fileLocation;
 
     private DocumentEntityBuilder() {
@@ -36,7 +36,7 @@ public class DocumentEntityBuilder {
                 .fileLocation(TestData.DOCUMENT_FILE_LOCATION);
     }
 
-    public DocumentEntityBuilder id(long id) {
+    public DocumentEntityBuilder id(Long id) {
         this.id = id;
         return this;
     }
@@ -66,7 +66,7 @@ public class DocumentEntityBuilder {
         return this;
     }
 
-    public DocumentEntityBuilder sensible(boolean sensible) {
+    public DocumentEntityBuilder sensible(Boolean sensible) {
         this.sensible = sensible;
         return this;
     }
