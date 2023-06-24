@@ -13,30 +13,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
-import com.rovlkr.documentbase.mapping.TagMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.entity.TagEntityBuilder;
 import com.rovlkr.documentbase.entity.TagEntity;
 import com.rovlkr.documentbase.service.TagService;
 
 @WebMvcTest(TagResource.class)
+@Import(ResourceTestConfiguration.class)
 class TagResourceTest {
-
-    @TestConfiguration
-    static class TagResourceTestConfiguration {
-        @Bean
-        public TagMapper tagMapper() {
-            return new TagMapper();
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +37,7 @@ class TagResourceTest {
     @Test
     void createTag_defaultTagName_successful() throws Exception {
         /// Arrange ///
-        TagEntity tagEntity = TagEntityBuilder.builder().id(null).name(TestData.TAG_NAME_1).build();
+        TagEntity tagEntity = TestData.newTagEntity().build();
         when(tagService.createTag(tagEntity)).thenReturn(1L);
 
         /// Act + Assert ///
@@ -60,7 +50,7 @@ class TagResourceTest {
     @Test
     void getAllCategories_noArgs_successful() throws Exception {
         /// Arrange ///
-        TagEntity tagEntity = TagEntityBuilder.builder().withDefaultValues1().build();
+        TagEntity tagEntity = TestData.tagEntity1().build();
         when(tagService.getAllTags()).thenReturn(List.of(tagEntity));
 
         /// Act + Assert ///
@@ -75,7 +65,7 @@ class TagResourceTest {
     void getTag_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        TagEntity tagEntity = TagEntityBuilder.builder().withDefaultValues1().build();
+        TagEntity tagEntity = TestData.tagEntity1().build();
         when(tagService.getTag(id)).thenReturn(Optional.of(tagEntity));
 
         /// Act + Assert ///

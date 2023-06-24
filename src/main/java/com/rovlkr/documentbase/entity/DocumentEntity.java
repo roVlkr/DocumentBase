@@ -1,5 +1,7 @@
 package com.rovlkr.documentbase.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,19 +14,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
+import lombok.Singular;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "document",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"id", "name"})
-)
+@Table(name = "document", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "name" }))
 public class DocumentEntity {
 
     @Id
@@ -42,11 +42,10 @@ public class DocumentEntity {
     private CategoryEntity category;
 
     @ManyToMany
-    @JoinTable(
-            name = "document_tags",
-            joinColumns = @JoinColumn(name = "document_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+    @JoinTable(name = "document_tags", //
+            joinColumns = @JoinColumn(name = "document_id"), //
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @Singular
     private Set<TagEntity> tags;
 
     @Column

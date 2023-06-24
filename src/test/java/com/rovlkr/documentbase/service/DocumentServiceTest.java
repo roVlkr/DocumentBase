@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.entity.DocumentEntityBuilder;
 import com.rovlkr.documentbase.entity.DocumentEntity;
 import com.rovlkr.documentbase.repository.DocumentRepository;
 
@@ -44,8 +43,8 @@ class DocumentServiceTest {
     @Test
     void createDocument_withNewDocumentGiven_createsViaRepository() {
         /// Arrange ///
-        DocumentEntity documentEntity = DocumentEntityBuilder.builder().withDefaultValues().id(null).build();
-        DocumentEntity savedEntity = DocumentEntityBuilder.builder().withDefaultValues().build();
+        DocumentEntity documentEntity = TestData.newDocumentEntity().build();
+        DocumentEntity savedEntity = TestData.documentEntity().build();
         when(repository.save(any(DocumentEntity.class))).thenReturn(savedEntity);
 
         /// Act ///
@@ -60,7 +59,7 @@ class DocumentServiceTest {
     void searchDocuments_withTextGiven_searchesViaRepository() {
         /// Arrange ///
         final String searchText = "mySearchText";
-        DocumentEntity documentEntity = DocumentEntityBuilder.builder().withDefaultValues().build();
+        DocumentEntity documentEntity = TestData.documentEntity().build();
         when(mockPage.get()).thenReturn(Stream.of(documentEntity));
         when(repository.findAll(specificationArg.capture(), any(Pageable.class))).thenReturn(mockPage);
 
@@ -79,7 +78,7 @@ class DocumentServiceTest {
     void getDocument_withId_getsViaRepository() {
         /// Arrange ///
         Long id = 1L;
-        DocumentEntity entity = DocumentEntityBuilder.builder().withDefaultValues().id(id).build();
+        DocumentEntity entity = TestData.documentEntity().id(id).build();
         when(repository.findById(id)).thenReturn(Optional.of(entity));
 
         /// Act ///

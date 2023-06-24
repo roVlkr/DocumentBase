@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.entity.TagEntityBuilder;
 import com.rovlkr.documentbase.entity.TagEntity;
 import com.rovlkr.documentbase.repository.TagRepository;
 
@@ -31,8 +30,8 @@ class TagServiceTest {
     @Test
     void createTag_withTagName_createsViaRepository() {
         /// Arrange ///
-        TagEntity tagEntity = TagEntityBuilder.builder().withDefaultValues1().id(null).build();
-        TagEntity savedEntity = TagEntityBuilder.builder().withDefaultValues1().build();
+        TagEntity tagEntity = TestData.newTagEntity().build();
+        TagEntity savedEntity = TestData.tagEntity1().build();
         when(repository.save(tagEntity)).thenReturn(savedEntity);
 
         /// Act ///
@@ -46,7 +45,7 @@ class TagServiceTest {
     @Test
     void getAllTags_withoutArgs_getsAllViaRepository() {
         /// Arrange ///
-        TagEntity entity = TagEntityBuilder.builder().withDefaultValues1().build();
+        TagEntity entity = TestData.tagEntity1().build();
         when(repository.findAll()).thenReturn(List.of(entity));
 
         /// Act ///
@@ -61,7 +60,7 @@ class TagServiceTest {
     void getTag_withId_getsViaRepository() {
         /// Arrange ///
         Long id = 1L;
-        TagEntity entity = TagEntityBuilder.builder().id(id).name(TestData.TAG_NAME_1).build();
+        TagEntity entity = TestData.tagEntity1().id(id).build();
         when(repository.findById(id)).thenReturn(Optional.of(entity));
 
         /// Act ///

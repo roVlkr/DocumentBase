@@ -9,10 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -25,8 +27,4 @@ public class CategoryEntity {
 
     @Column(name = "name")
     private String name;
-
-    public CategoryEntity(String name) {
-        this.name = name;
-    }
 }

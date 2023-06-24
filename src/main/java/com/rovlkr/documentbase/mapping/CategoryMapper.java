@@ -1,28 +1,18 @@
 package com.rovlkr.documentbase.mapping;
 
+import org.mapstruct.Mapper;
+
 import com.rovlkr.documentbase.entity.CategoryEntity;
 import com.rovlkr.documentbase.model.Category;
-import org.springframework.stereotype.Component;
 
-@Component
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
 
-    public Category toModel(CategoryEntity entity) {
-        Category category = new Category();
-        category.setId(entity.getId());
-        category.setName(entity.getName());
+    Category toModel(CategoryEntity entity);
 
-        return category;
-    }
+    CategoryEntity toEntity(Category model);
 
-    public CategoryEntity toEntity(Category model) {
-        CategoryEntity entity = new CategoryEntity(model.getName());
-        entity.setId(model.getId());
-
-        return entity;
-    }
-
-    public CategoryEntity toEntity(String categoryName) {
-        return new CategoryEntity(categoryName);
+    default CategoryEntity toEntity(String categoryName) {
+        return CategoryEntity.builder().name(categoryName).build();
     }
 }

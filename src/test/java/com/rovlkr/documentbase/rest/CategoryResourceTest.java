@@ -13,30 +13,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.rovlkr.documentbase.mapping.CategoryMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.entity.CategoryEntityBuilder;
 import com.rovlkr.documentbase.entity.CategoryEntity;
 import com.rovlkr.documentbase.service.CategoryService;
 
 @WebMvcTest(CategoryResource.class)
+@Import(ResourceTestConfiguration.class)
 class CategoryResourceTest {
-
-    @TestConfiguration
-    static class CategoryResourceTestConfiguration {
-        @Bean
-        public CategoryMapper categoryMapper() {
-            return new CategoryMapper();
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +37,7 @@ class CategoryResourceTest {
     @Test
     void createCategory_defaultCategoryName_successful() throws Exception {
         /// Arrange ///
-        CategoryEntity categoryEntity = CategoryEntityBuilder.builder().id(null).name(TestData.CATEGORY_NAME).build();
+        CategoryEntity categoryEntity = TestData.newCategoryEntity().build();
         when(categoryService.createCategory(categoryEntity)).thenReturn(1L);
 
         /// Act + Assert ///
@@ -60,7 +50,7 @@ class CategoryResourceTest {
     @Test
     void getAllCategories_noArgs_successful() throws Exception {
         /// Arrange ///
-        CategoryEntity categoryEntity = CategoryEntityBuilder.builder().withDefaultValues().build();
+        CategoryEntity categoryEntity = TestData.categoryEntity().build();
         when(categoryService.getAllCategories()).thenReturn(Stream.of(categoryEntity));
 
         /// Act + Assert ///
@@ -75,7 +65,7 @@ class CategoryResourceTest {
     void getCategory_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        CategoryEntity categoryEntity = CategoryEntityBuilder.builder().withDefaultValues().build();
+        CategoryEntity categoryEntity = TestData.categoryEntity().build();
         when(categoryService.getCategory(id)).thenReturn(Optional.of(categoryEntity));
 
         /// Act + Assert ///

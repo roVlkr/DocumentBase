@@ -18,33 +18,20 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.builder.entity.DocumentEntityBuilder;
-import com.rovlkr.documentbase.builder.model.NewDocumentBuilder;
 import com.rovlkr.documentbase.entity.DocumentEntity;
-import com.rovlkr.documentbase.mapping.CategoryMapper;
 import com.rovlkr.documentbase.mapping.DocumentMapper;
-import com.rovlkr.documentbase.mapping.TagMapper;
 import com.rovlkr.documentbase.model.NewDocument;
 import com.rovlkr.documentbase.service.DocumentService;
 
 @WebMvcTest(DocumentResource.class)
+@Import(ResourceTestConfiguration.class)
 class DocumentResourceTest {
-
-    @TestConfiguration
-    static class DocumentResourceTestConfiguration {
-        @Bean
-        public DocumentMapper documentMapper() {
-            return new DocumentMapper(new CategoryMapper(), new TagMapper());
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,7 +46,7 @@ class DocumentResourceTest {
     void searchDocuments_withText_searchesViaService() throws Exception {
         /// Arrange ///
         final String searchText = "mySearchText";
-        DocumentEntity documentEntity = DocumentEntityBuilder.builder().withDefaultValues().build();
+        DocumentEntity documentEntity = TestData.documentEntity().build();
         when(documentService.searchDocuments(eq(searchText), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(Stream.of(documentEntity));
 
@@ -74,23 +61,23 @@ class DocumentResourceTest {
     @Test
     void createDocument_defaultDocument_addsViaService() throws Exception {
         /// Arrange ///
-        final NewDocument document = NewDocumentBuilder.builder().withDefaultValues().build();
-        final DocumentEntity mappedEntity = mapper.toEntity(document);
+        final NewDocument document = TestData.newDocument().build();
+        final DocumentEntity documentEntity = TestData.newDocumentEntity().build();
         String json = new ObjectMapper().writeValueAsString(document);
-        when(documentService.createDocument(mappedEntity)).thenReturn(1L);
+        when(documentService.createDocument(documentEntity)).thenReturn(1L);
 
         /// Act + Assert ///
         mockMvc.perform(post("/documents").content(json).contentType("application/json"))
                 .andExpect(status().isCreated()) //
                 .andExpect(content().string("1"));
-        verify(documentService).createDocument(mappedEntity);
+        verify(documentService).createDocument(documentEntity);
     }
 
     @Test
     void getDocument_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        DocumentEntity documentEntity = DocumentEntityBuilder.builder().withDefaultValues().build();
+        DocumentEntity documentEntity = TestData.documentEntity().build();
         when(documentService.getDocument(id)).thenReturn(Optional.of(documentEntity));
 
         /// Act + Assert ///
