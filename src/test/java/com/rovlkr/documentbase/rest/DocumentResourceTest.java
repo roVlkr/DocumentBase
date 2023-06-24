@@ -2,6 +2,7 @@ package com.rovlkr.documentbase.rest;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
@@ -15,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.rovlkr.documentbase.dto.DocumentDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,9 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.entity.DocumentEntity;
+import com.rovlkr.documentbase.entity.Document;
 import com.rovlkr.documentbase.mapping.DocumentMapper;
-import com.rovlkr.documentbase.model.NewDocument;
 import com.rovlkr.documentbase.service.DocumentService;
 
 @WebMvcTest(DocumentResource.class)
@@ -46,9 +47,9 @@ class DocumentResourceTest {
     void searchDocuments_withText_searchesViaService() throws Exception {
         /// Arrange ///
         final String searchText = "mySearchText";
-        DocumentEntity documentEntity = TestData.documentEntity().build();
+        Document document = TestData.document().build();
         when(documentService.searchDocuments(eq(searchText), isNull(), isNull(), isNull(), isNull()))
-                .thenReturn(Stream.of(documentEntity));
+                .thenReturn(Stream.of(document));
 
         /// Act + Assert ///
         mockMvc.perform(get("/documents").param("text", searchText)).andExpect(status().isOk()) //
@@ -61,24 +62,24 @@ class DocumentResourceTest {
     @Test
     void createDocument_defaultDocument_addsViaService() throws Exception {
         /// Arrange ///
-        final NewDocument document = TestData.newDocument().build();
-        final DocumentEntity documentEntity = TestData.newDocumentEntity().build();
-        String json = new ObjectMapper().writeValueAsString(document);
-        when(documentService.createDocument(documentEntity)).thenReturn(1L);
+        final DocumentDTO documentDTO = TestData.newDocumentDTO().build();
+        final Document document = TestData.newDocument().build();
+        String json = new ObjectMapper().writeValueAsString(documentDTO);
+        when(documentService.createDocument(any(Document.class))).thenReturn(1L);
 
         /// Act + Assert ///
         mockMvc.perform(post("/documents").content(json).contentType("application/json"))
                 .andExpect(status().isCreated()) //
                 .andExpect(content().string("1"));
-        verify(documentService).createDocument(documentEntity);
+        verify(documentService).createDocument(document);
     }
 
     @Test
     void getDocument_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        DocumentEntity documentEntity = TestData.documentEntity().build();
-        when(documentService.getDocument(id)).thenReturn(Optional.of(documentEntity));
+        Document document = TestData.document().build();
+        when(documentService.getDocument(id)).thenReturn(Optional.of(document));
 
         /// Act + Assert ///
         mockMvc.perform(get("/documents/" + id)).andExpect(status().isOk())

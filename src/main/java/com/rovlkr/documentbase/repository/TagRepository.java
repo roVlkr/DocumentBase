@@ -1,7 +1,6 @@
 package com.rovlkr.documentbase.repository;
 
+import com.rovlkr.documentbase.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.rovlkr.documentbase.entity.TagEntity;
-
-public interface TagRepository extends JpaRepository<TagEntity, Long> {}
+public interface TagRepository extends JpaRepository<Tag, Long> {}

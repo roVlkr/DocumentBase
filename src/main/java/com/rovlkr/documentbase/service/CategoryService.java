@@ -3,9 +3,9 @@ package com.rovlkr.documentbase.service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.rovlkr.documentbase.entity.Category;
 import org.springframework.stereotype.Service;
 
-import com.rovlkr.documentbase.entity.CategoryEntity;
 import com.rovlkr.documentbase.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,15 +16,15 @@ public class CategoryService {
 
     private final CategoryRepository repository;
 
-    public Long createCategory(CategoryEntity entity) {
+    public Long createCategory(Category entity) {
         return repository.save(entity).getId();
     }
 
-    public Stream<CategoryEntity> getAllCategories() {
+    public Stream<Category> getAllCategories() {
         return repository.findAll().stream();
     }
 
-    public Optional<CategoryEntity> getCategory(Long categoryId) {
+    public Optional<Category> getCategory(Long categoryId) {
         return repository.findById(categoryId);
     }
 }

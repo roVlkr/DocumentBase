@@ -2,17 +2,17 @@ package com.rovlkr.documentbase.mapping;
 
 import org.mapstruct.Mapper;
 
-import com.rovlkr.documentbase.entity.CategoryEntity;
-import com.rovlkr.documentbase.model.Category;
+import com.rovlkr.documentbase.entity.Category;
+import com.rovlkr.documentbase.dto.CategoryDTO;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
-    Category toModel(CategoryEntity entity);
+    CategoryDTO toDTO(Category entity);
 
-    CategoryEntity toEntity(Category model);
+    Category toEntity(CategoryDTO dto);
 
-    default CategoryEntity toEntity(String categoryName) {
-        return CategoryEntity.builder().name(categoryName).build();
+    default Category toEntity(String categoryName) {
+        return Category.builder().name(categoryName).build();
     }
 }

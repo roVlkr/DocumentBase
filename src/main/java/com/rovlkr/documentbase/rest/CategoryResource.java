@@ -3,6 +3,7 @@ package com.rovlkr.documentbase.rest;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.rovlkr.documentbase.dto.CategoryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rovlkr.documentbase.mapping.CategoryMapper;
-import com.rovlkr.documentbase.model.Category;
 import com.rovlkr.documentbase.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,14 +33,14 @@ public class CategoryResource {
     }
 
     @GetMapping
-    public ResponseEntity<Set<Category>> getAllCategories() {
-        Set<Category> categories = service.getAllCategories().map(mapper::toModel).collect(Collectors.toSet());
+    public ResponseEntity<Set<CategoryDTO>> getAllCategories() {
+        Set<CategoryDTO> categories = service.getAllCategories().map(mapper::toDTO).collect(Collectors.toSet());
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategory(@PathVariable("id") Long categoryId) {
-        return service.getCategory(categoryId).map(mapper::toModel).map(ResponseEntity::ok)
+    public ResponseEntity<CategoryDTO> getCategory(@PathVariable("id") Long categoryId) {
+        return service.getCategory(categoryId).map(mapper::toDTO).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 }

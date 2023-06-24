@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.entity.CategoryEntity;
+import com.rovlkr.documentbase.entity.Category;
 import com.rovlkr.documentbase.service.CategoryService;
 
 @WebMvcTest(CategoryResource.class)
@@ -37,21 +37,21 @@ class CategoryResourceTest {
     @Test
     void createCategory_defaultCategoryName_successful() throws Exception {
         /// Arrange ///
-        CategoryEntity categoryEntity = TestData.newCategoryEntity().build();
-        when(categoryService.createCategory(categoryEntity)).thenReturn(1L);
+        Category category = TestData.newCategory().build();
+        when(categoryService.createCategory(category)).thenReturn(1L);
 
         /// Act + Assert ///
-        mockMvc.perform(post("/categories").content(categoryEntity.getName())) //
+        mockMvc.perform(post("/categories").content(category.getName())) //
                 .andExpect(status().isCreated()) //
                 .andExpect(content().string("1"));
-        verify(categoryService).createCategory(categoryEntity);
+        verify(categoryService).createCategory(category);
     }
 
     @Test
     void getAllCategories_noArgs_successful() throws Exception {
         /// Arrange ///
-        CategoryEntity categoryEntity = TestData.categoryEntity().build();
-        when(categoryService.getAllCategories()).thenReturn(Stream.of(categoryEntity));
+        Category category = TestData.category().build();
+        when(categoryService.getAllCategories()).thenReturn(Stream.of(category));
 
         /// Act + Assert ///
         mockMvc.perform(get("/categories")) //
@@ -65,8 +65,8 @@ class CategoryResourceTest {
     void getCategory_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        CategoryEntity categoryEntity = TestData.categoryEntity().build();
-        when(categoryService.getCategory(id)).thenReturn(Optional.of(categoryEntity));
+        Category category = TestData.category().build();
+        when(categoryService.getCategory(id)).thenReturn(Optional.of(category));
 
         /// Act + Assert ///
         mockMvc.perform(get("/categories/" + id)).andExpect(status().isOk())

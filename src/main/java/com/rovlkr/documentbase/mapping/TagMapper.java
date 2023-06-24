@@ -3,17 +3,17 @@ package com.rovlkr.documentbase.mapping;
 
 import org.mapstruct.Mapper;
 
-import com.rovlkr.documentbase.entity.TagEntity;
-import com.rovlkr.documentbase.model.Tag;
+import com.rovlkr.documentbase.entity.Tag;
+import com.rovlkr.documentbase.dto.TagDTO;
 
 @Mapper(componentModel = "spring")
 public interface TagMapper {
 
-    Tag toModel(TagEntity entity);
+    TagDTO toDTO(Tag entity);
 
-    TagEntity toEntity(Tag model);
+    Tag toEntity(TagDTO dto);
 
-    default TagEntity toEntity(String tagName) {
-        return TagEntity.builder().name(tagName).build();
+    default Tag toEntity(String tagName) {
+        return Tag.builder().name(tagName).build();
     }
 }

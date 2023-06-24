@@ -14,8 +14,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.rovlkr.documentbase.entity.DocumentEntity;
-import com.rovlkr.documentbase.entity.TagEntity;
+import com.rovlkr.documentbase.entity.Document;
+import com.rovlkr.documentbase.entity.Tag;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -32,7 +32,7 @@ class DocumentSpecificationsTest {
         final String categoryName = "Rechnung";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentHasCategory(categoryId)));
 
         /// Assert ///
@@ -43,7 +43,7 @@ class DocumentSpecificationsTest {
     @Sql("/sql/insertDocumentsWithTags.sql")
     void documentContainsTags_noTag_findsAllEntities() {
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentContainsTags(Collections.emptySet())));
 
         /// Assert ///
@@ -58,12 +58,12 @@ class DocumentSpecificationsTest {
         final String tagName1 = "krankenkasse";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentContainsTags(Collections.singleton(tagId))));
 
         /// Assert ///
         assertThat(foundDocuments).hasSize(2)
-                .allSatisfy(d -> assertThat(d.getTags()).map(TagEntity::getName).contains(tagName1));
+                .allSatisfy(d -> assertThat(d.getTags()).map(Tag::getName).contains(tagName1));
     }
 
     @Test
@@ -75,12 +75,11 @@ class DocumentSpecificationsTest {
         final String tagName2 = "kfz-versicherung";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
-                repository.findAll(where(DocumentSpecifications.documentContainsTags(allTags)));
+        List<Document> foundDocuments = repository.findAll(where(DocumentSpecifications.documentContainsTags(allTags)));
 
         /// Assert ///
         assertThat(foundDocuments).hasSize(1).first()
-                .satisfies(d -> assertThat(d.getTags()).map(TagEntity::getName).containsExactly(tagName1, tagName2));
+                .satisfies(d -> assertThat(d.getTags()).map(Tag::getName).containsExactly(tagName1, tagName2));
     }
 
     @Test
@@ -90,11 +89,11 @@ class DocumentSpecificationsTest {
         final boolean sensible = true;
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentHasSensibility(sensible)));
 
         /// Assert ///
-        assertThat(foundDocuments).hasSize(1).first().matches(DocumentEntity::getSensible);
+        assertThat(foundDocuments).hasSize(1).first().matches(Document::getSensible);
     }
 
     @Test
@@ -104,7 +103,7 @@ class DocumentSpecificationsTest {
         final String textToSearchFor = "Schule";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentMatchesText(textToSearchFor)));
 
         /// Assert ///
@@ -118,7 +117,7 @@ class DocumentSpecificationsTest {
         final String textToSearchFor = "Rechnung123";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentMatchesText(textToSearchFor)));
 
         /// Assert ///
@@ -132,7 +131,7 @@ class DocumentSpecificationsTest {
         final String textToSearchFor = "123";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentMatchesText(textToSearchFor)));
 
         /// Assert ///
@@ -146,7 +145,7 @@ class DocumentSpecificationsTest {
         final String textToSearchFor = "rechnung";
 
         /// Act ///
-        List<DocumentEntity> foundDocuments =
+        List<Document> foundDocuments =
                 repository.findAll(where(DocumentSpecifications.documentMatchesText(textToSearchFor)));
 
         /// Assert ///

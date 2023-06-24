@@ -3,9 +3,9 @@ package com.rovlkr.documentbase.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.rovlkr.documentbase.entity.Tag;
 import org.springframework.stereotype.Service;
 
-import com.rovlkr.documentbase.entity.TagEntity;
 import com.rovlkr.documentbase.repository.TagRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,15 +16,15 @@ public class TagService {
 
     private final TagRepository repository;
 
-    public Long createTag(TagEntity tag) {
+    public Long createTag(Tag tag) {
         return repository.save(tag).getId();
     }
 
-    public List<TagEntity> getAllTags() {
+    public List<Tag> getAllTags() {
         return repository.findAll();
     }
 
-    public Optional<TagEntity> getTag(Long tagId) {
+    public Optional<Tag> getTag(Long tagId) {
         return repository.findById(tagId);
     }
 }

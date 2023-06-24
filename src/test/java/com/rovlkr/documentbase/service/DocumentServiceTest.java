@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.rovlkr.documentbase.entity.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,17 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.entity.DocumentEntity;
 import com.rovlkr.documentbase.repository.DocumentRepository;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentServiceTest {
 
     @Captor
-    private ArgumentCaptor<Specification<DocumentEntity>> specificationArg;
+    private ArgumentCaptor<Specification<Document>> specificationArg;
 
     @Mock
-    private Page<DocumentEntity> mockPage;
+    private Page<Document> mockPage;
 
     @Mock
     private DocumentRepository repository;
@@ -43,15 +43,15 @@ class DocumentServiceTest {
     @Test
     void createDocument_withNewDocumentGiven_createsViaRepository() {
         /// Arrange ///
-        DocumentEntity documentEntity = TestData.newDocumentEntity().build();
-        DocumentEntity savedEntity = TestData.documentEntity().build();
-        when(repository.save(any(DocumentEntity.class))).thenReturn(savedEntity);
+        Document document = TestData.newDocument().build();
+        Document savedDocument = TestData.document().build();
+        when(repository.save(document)).thenReturn(savedDocument);
 
         /// Act ///
-        Long id = classUnderTest.createDocument(documentEntity);
+        Long id = classUnderTest.createDocument(document);
 
         /// Assert ///
-        verify(repository).save(any(DocumentEntity.class));
+        verify(repository).save(document);
         assertThat(id).isEqualTo(TestData.DOCUMENT_ID);
     }
 
@@ -59,33 +59,33 @@ class DocumentServiceTest {
     void searchDocuments_withTextGiven_searchesViaRepository() {
         /// Arrange ///
         final String searchText = "mySearchText";
-        DocumentEntity documentEntity = TestData.documentEntity().build();
-        when(mockPage.get()).thenReturn(Stream.of(documentEntity));
+        Document document = TestData.document().build();
+        when(mockPage.get()).thenReturn(Stream.of(document));
         when(repository.findAll(specificationArg.capture(), any(Pageable.class))).thenReturn(mockPage);
 
         /// Act ///
-        Stream<DocumentEntity> foundDocuments = classUnderTest.searchDocuments(searchText, null, null, null, null);
+        Stream<Document> foundDocuments = classUnderTest.searchDocuments(searchText, null, null, null, null);
 
         /// Assert ///
-        Specification<DocumentEntity> spec = specificationArg.getValue();
+        Specification<Document> spec = specificationArg.getValue();
         assertThat(spec).isNotNull();
         verify(repository).findAll(eq(spec), any(Pageable.class));
         assertThat(foundDocuments).hasSize(1).first()
-                .matches(document -> Objects.equals(documentEntity.getName(), document.getName()));
+                .matches(d -> Objects.equals(document.getName(), d.getName()));
     }
 
     @Test
     void getDocument_withId_getsViaRepository() {
         /// Arrange ///
         Long id = 1L;
-        DocumentEntity entity = TestData.documentEntity().id(id).build();
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        Document document = TestData.document().id(id).build();
+        when(repository.findById(id)).thenReturn(Optional.of(document));
 
         /// Act ///
-        Optional<DocumentEntity> actual = classUnderTest.getDocument(id);
+        Optional<Document> actual = classUnderTest.getDocument(id);
 
         /// Assert ///
         verify(repository).findById(id);
-        assertThat(actual).isPresent().get().isEqualTo(entity);
+        assertThat(actual).isPresent().get().isEqualTo(document);
     }
 }

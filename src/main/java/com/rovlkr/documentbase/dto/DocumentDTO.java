@@ -1,4 +1,4 @@
-package com.rovlkr.documentbase.model;
+package com.rovlkr.documentbase.dto;
 
 import java.util.Set;
 
@@ -12,12 +12,14 @@ import lombok.Singular;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NewDocument {
+public class DocumentDTO {
 
+    private Long id;
     private String name;
     private String description;
-    private Category category;
+    private CategoryDTO category;
     @Singular
-    private Set<Tag> tags;
-    private boolean sensible;
+    private Set<TagDTO> tags;
+    private Boolean sensible;
+    private String fileLocation;
 }

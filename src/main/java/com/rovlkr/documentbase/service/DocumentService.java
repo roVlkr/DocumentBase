@@ -10,13 +10,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.rovlkr.documentbase.entity.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.rovlkr.documentbase.entity.DocumentEntity;
 import com.rovlkr.documentbase.repository.DocumentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,15 +29,15 @@ public class DocumentService {
 
     private final DocumentRepository repository;
 
-    public Long createDocument(DocumentEntity document) {
+    public Long createDocument(Document document) {
         return repository.save(document).getId();
     }
 
-    public String uploadFile(DocumentEntity document, MultipartFile file) {
+    public String uploadFile(Document document, MultipartFile file) {
         return null;
     }
 
-    public Stream<DocumentEntity> searchDocuments(String text, Long categoryId, Set<Long> tagIds, Boolean sensible,
+    public Stream<Document> searchDocuments(String text, Long categoryId, Set<Long> tagIds, Boolean sensible,
             Integer limit) {
         if (limit == null) {
             limit = DEFAULT_PAGE_SIZE;
@@ -45,7 +45,7 @@ public class DocumentService {
 
         Pageable page = PageRequest.ofSize(limit);
         // @formatter:off
-        Page<DocumentEntity> documentEntities = repository.findAll(
+        Page<Document> documentEntities = repository.findAll(
                 where(documentMatchesText(text)
                         .and(documentHasCategory(categoryId))
                         .and(documentContainsTags(tagIds))
@@ -55,7 +55,7 @@ public class DocumentService {
         return documentEntities.get();
     }
 
-    public Optional<DocumentEntity> getDocument(Long id) {
+    public Optional<Document> getDocument(Long id) {
         return repository.findById(id);
     }
 }

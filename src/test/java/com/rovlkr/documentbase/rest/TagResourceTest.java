@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Optional;
 
+import com.rovlkr.documentbase.entity.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rovlkr.documentbase.TestData;
-import com.rovlkr.documentbase.entity.TagEntity;
 import com.rovlkr.documentbase.service.TagService;
 
 @WebMvcTest(TagResource.class)
@@ -37,21 +37,21 @@ class TagResourceTest {
     @Test
     void createTag_defaultTagName_successful() throws Exception {
         /// Arrange ///
-        TagEntity tagEntity = TestData.newTagEntity().build();
-        when(tagService.createTag(tagEntity)).thenReturn(1L);
+        Tag tag = TestData.newTag().build();
+        when(tagService.createTag(tag)).thenReturn(1L);
 
         /// Act + Assert ///
-        mockMvc.perform(post("/tags").content(tagEntity.getName())) //
+        mockMvc.perform(post("/tags").content(tag.getName())) //
                 .andExpect(status().isCreated()) //
                 .andExpect(content().string("1"));
-        verify(tagService).createTag(tagEntity);
+        verify(tagService).createTag(tag);
     }
 
     @Test
     void getAllCategories_noArgs_successful() throws Exception {
         /// Arrange ///
-        TagEntity tagEntity = TestData.tagEntity1().build();
-        when(tagService.getAllTags()).thenReturn(List.of(tagEntity));
+        Tag tag = TestData.tag1().build();
+        when(tagService.getAllTags()).thenReturn(List.of(tag));
 
         /// Act + Assert ///
         mockMvc.perform(get("/tags")) //
@@ -65,8 +65,8 @@ class TagResourceTest {
     void getTag_withId_successful() throws Exception {
         /// Arrange ///
         final Long id = 1L;
-        TagEntity tagEntity = TestData.tagEntity1().build();
-        when(tagService.getTag(id)).thenReturn(Optional.of(tagEntity));
+        Tag tag = TestData.tag1().build();
+        when(tagService.getTag(id)).thenReturn(Optional.of(tag));
 
         /// Act + Assert ///
         mockMvc.perform(get("/tags/" + id)).andExpect(status().isOk())
